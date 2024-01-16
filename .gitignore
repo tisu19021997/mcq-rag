@@ -1,0 +1,49 @@
+Last login: Tue Jan 16 09:14:49 on ttys012
+❯ cd /Users/minhquang/Desktop/spaces/startup/talking-resume/backend
+❯ vi .gitignore
+❯ cd ..
+❯ vi .gitignore
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+.next
+
+# dependency directories
+node_modules
+jspm_packages
+
+##### BACKEND #####
+
+__pycache__
+storage
+.env
+.DS_Store
+firebase_creds.json
+
+
