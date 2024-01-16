@@ -12,9 +12,9 @@ from src.index import split_and_embed_corpus
 from src.retrieval import retrieve_context
 from src.llm import load_llm, predict, is_the_answer_correct, instruct_prompt
 
-corpus_path = Path('/kaggle/input/kalapa-vietmedqa/corpus')
-corpus_preproc_path = Path('/kaggle/working/output')
-test_path = Path('/kaggle/input/kalapa-vietmedqa/public_test.csv')
+corpus_path = Path('./data/corpus')
+corpus_preproc_path = Path('./data/output')
+test_path = Path('./data/public_test.csv')
 
 if __name__ == '__main__':
     # 0. Preprocessing steps.

@@ -87,3 +87,6 @@ def is_the_answer_correct(model, tokenizer, prompt, correct_str="1", incorrect_s
     * [x] implement basic `sentence-splitter` (same as `llamaindex`).
     * [x] how to do multiple choice question with LLM.
     * [x] be creative and apply small tricks to largely improve the result. 
+
+---
+* A running notebook can be found here: https://www.kaggle.com/code/quangphm/multiple-choice-rag/notebook
