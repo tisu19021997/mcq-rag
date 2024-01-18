@@ -2,18 +2,43 @@
 That's the question I asked myself when I participated on a LLM competition that ends in a week.
 
 ## The story
-* I found out about the competition only a week before the competition closed. I only participated because **I wanted to know RAG better**. I knew I had no chance of winning xd.
-    * I decided to *build a noob RAG system from scratch* to solve the competition.
+* I found out about the competition only a week before it closed. I only participated because **I wanted to know RAG better**. I knew I had no chance of winning xd.
+* I decided to **build a noob RAG system from scratch** to solve the competition.
 
 ## The competition
 https://challenge.kalapa.vn/portal/vietnamese-medical-question-answering/overview
 * The competition provided dataset with information (causes, symptoms, prevention method, etc.) about ~600 diseases in Vietnamese.
+    * The dataset contains about 600 files about various diseases from a medical website.
+
 * Participants use the dataset to answer multiple-choice questions and there exists more than 1 correct answer.
-* **Required output**: a binary string with length `n` with element `i`th is 0 if choice `i`th in the question is incorrect, 1 if it's correct.
+
+| id | question | option_1 | option_2 | option_3 | option_4 | option_5 | option_6 | 
+| -- | -------- | -------- | -------- | -------- | -------- | -------- | -------- |
+| 1  | ...Hương có thể kiểm tra phát hiện bệnh này từ tuần thứ mấy của thai kỳ?| A. Tuần 10| B.Tuần 20 | C. Tuần 30| D. Tuần 40| | | | 
+
+* **Required output**: a binary string with length `n` with element `i`-th is 0 if choice `i`-th in the question is incorrect, 1 if it's correct.
 
 | Question |	Expected Answer|
 |--------- | ---------------|
 |Đâu là triệu chứng của bệnh van tim? A. Khó thở B. Tăng cân nhanh chóng C. Vàng da D. Rụng tóc | `1100`
+
+## The pipeline
+
+### Preprocess
+* Recover the Vietnamese accents in data file name: use the disease name at the beginning of each file or rename it manually.
+
+### Retrieval
+For each question, answer 2 questions:
+1. Which files to retrieve: [details here](#how-to-limit-files-to-retrieve-for-each-question).
+2. Which chunk of text in the retrieved file to use as context: use `sentence-transformers` to embed the text and use `semantic_search` to get `top-k` related context.
+
+**Output**: context for LLM.
+
+### Generation (LLM)
+* For each question, for each proposed answer, ask `llm` if the answer is correct with the provided context from **Retrieval**. If yes, output `1`, else `0`.
+* Output format: to make sure the output is in the required output, I use the [method here](#how-to-force-the-llm-to-output-binary-string).
+
+**Output**: binary string.
 
 ## The questions
 
@@ -22,11 +47,11 @@ https://challenge.kalapa.vn/portal/vietnamese-medical-question-answering/overvie
 2. I want to understand deeply each part in a RAG system (how many parts a simple RAG have, how to indexing, get embeddings, retrieve context, etc.).
 
 ### How to limit files to retrieve for each question?
-* Because there are ~600 files/diseases and if there are 100 questions to answer then I'd have to do `semantic_search` for like 60000 times. God, I only had Colab's free T4s (my Mac chips suck at working with LLM, `mps` is fully supported yet).
-* So I used the `question` for each answer, I compared its similarity with ~600 file/disease **names** (not the content of the file!).
-    * More specific, I used `ROUGE-l` to measure their similarity. It's like matching each word in the `question` with words in the `disease_name`.
-    * **Even more improvement**: I also used the `choices` to compare in case the question doesn't contain enough information.
-* Then, I only takes `top-2` files as context for each question. And for each file/disease, I search for `top-3` most related chunk of texts.
+* Because there are ~600 files/diseases and if there are 100 questions to answer then I'd have to do `semantic_search` for like 60000 times. God, I only had Colab's free T4s (my Mac chip sucks at working with LLM, `mps` is not fully supported yet).
+* Instead, I used the `question` for each answer, I compared its similarity with ~600 file/disease **names** (not the content of the file!).
+    * More specific, I used `ROUGE-l` to measure their similarity. It's like matching words in the `question` with words in the `disease_name`.
+    * **Even more improvement**: I also used the `choices` to compare, in case the question doesn't contain enough information.
+* Then, I takes `top-2` files as context for each question. And for each file, I search for `top-3` most related chunk of texts.
 
 ### How to force the LLM to output binary string?
 
